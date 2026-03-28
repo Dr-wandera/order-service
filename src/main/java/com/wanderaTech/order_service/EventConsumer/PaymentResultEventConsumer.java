@@ -23,9 +23,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PaymentResultEventConsumer {
     private final OrderRepository orderRepository;
-    private final SellerSnapShotRepository sellerSnapShotRepository;
     private final NotificationProducer notificationProducer;
-    private final CustomerSnapshotRepository customerSnapshotRepository;
+    private final UserSnapShotRepository userSnapShotRepository;
 
     @KafkaListener(
             topics = "payment-topic",
