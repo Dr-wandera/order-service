@@ -24,7 +24,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String orderNumber;
-    private String customerId;
+    private String userId;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
