@@ -33,8 +33,8 @@ public class OrderServiceImplementation implements OrderServiceInterface {
     private final CartClient cartClient;
     private final ReduceStockProducer reduceStockProducer;
     private final NotificationProducer notificationProducer;
-    private final CustomerSnapshotRepository customerSnapshotRepository;
     private final PaymentRequestProducer paymentRequestProducer;
+    private final UserSnapShotRepository userSnapShotRepository;
 
     @Transactional
     @Override
