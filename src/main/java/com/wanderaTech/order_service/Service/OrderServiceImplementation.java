@@ -40,7 +40,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
     @Override
     public OrderResponse placeOrder(OrderRequest orderRequest) {
 
-        // Optionally generate orderNumber
+        //generate order number
         String orderNumber = generateOrderNumber();
 
         //check order number to avoid multiple save of order with the same order Number
