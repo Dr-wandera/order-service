@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class ReduceStockProducer {
     private final KafkaTemplate<String, StockReduceEvent> kafkaTemplate;
 
+    //publish reduce stock event to inventory
     public void sendReduceStockAfterProductPurchase(StockReduceEvent stockReduceEvent){
         log.info("Start sending reduce stock event to  inventory");
 
