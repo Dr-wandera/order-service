@@ -72,17 +72,17 @@ public class PaymentResultEventConsumer {
     //send notification to seller  if the payment status is "paid"
     private void sendSellerNotifications(Order order) {
         // get customer email from the customerSnapShot saved in the order service.  (Customer replica)
-        CustomerSnapSot customerSnapSot = customerSnapshotRepository.findByCustomerId((order.getCustomerId()))
+        UsersSnapShot usersSnapShot = userSnapShotRepository.findByUserId((order.getUserId()))
                 .orElseThrow(()->new RuntimeException("customerId not available"));
 
-        String email = customerSnapSot.getEmail();
-        String customerPhoneNumber = customerSnapSot.getPhoneNumber();
+        String email = usersSnapShot.getEmail();
+        String customerPhoneNumber = usersSnapShot.getPhoneNumber();
 
         //this group the product of one seller in the order placed
         Map<String, List<OrderItem>> itemsBySeller =
                 order.getItems()
                         .stream()
-                        .collect(Collectors.groupingBy(OrderItem::getSellerId));
+                        .collect(Collectors.groupingBy(OrderItem::getUserId));
 
         //this iterates over the list of order item to send notification to seller
         for (Map.Entry<String, List<OrderItem>> entry : itemsBySeller.entrySet()) {
@@ -90,9 +90,8 @@ public class PaymentResultEventConsumer {
             String sellerId = entry.getKey();
             List<OrderItem> sellerItems = entry.getValue();
 
-            //check seller in the seller snapShot saved in order service
-            SellerSnapShot seller = sellerSnapShotRepository
-                    .findBySellerId(sellerId)
+            //check seller in  users snapShot
+              UsersSnapShot userSnapShot=userSnapShotRepository.findByUserId(sellerId)
                     .orElseThrow(() -> new RuntimeException("Seller not found"));
 
             List<OrderItemEvent> itemEvents = sellerItems.stream()
@@ -109,7 +108,7 @@ public class PaymentResultEventConsumer {
 
                     SellerNotificationEvent.builder()
                             .sellerId(sellerId)
-                            .sellerEmail(seller.getEmail())
+                            .sellerEmail(userSnapShot.getEmail())
                             .orderNumber(order.getOrderNumber())
                             .email(email)
                             .phoneNumber(customerPhoneNumber)
