@@ -88,8 +88,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
                     orderItem.setProductName(cartItem.getProductName());
                     orderItem.setQuantity(cartItem.getQuantity());
                     orderItem.setPrice(cartItem.getPrice());
-                    ;
-                    orderItem.setSellerId(cartItem.getSellerId());
+                    orderItem.setUserId(cartItem.getUserId());
                     orderItem.setOrder(order);
                     return orderItem;
                 })
@@ -100,7 +99,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
         Order savedOrder = orderRepository.save(order);
         log.info("Order  has saved successfully as PENDING  {}", savedOrder);
 
-        //sends payment event to payment service
+        //sends payment event
         paymentRequestProducer.sendOrderPlacementEvent(
                 new OrderPaymentEvent(
                         savedOrder.getOrderNumber(),
