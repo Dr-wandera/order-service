@@ -50,15 +50,15 @@ public class OrderServiceImplementation implements OrderServiceInterface {
         }
 
         // get customer email from the customerSnapShot saved in the order service.  (Customer replica)
-        CustomerSnapSot customerSnapSot = customerSnapshotRepository.findByCustomerId((orderRequest.getCustomerId()))
+        UsersSnapShot usersSnapShot = userSnapShotRepository.findByUserId((orderRequest.getUserId()))
                 .orElseThrow(() -> new RuntimeException("customerId not available"));
 
-        String email = customerSnapSot.getEmail();
-        String firstName = customerSnapSot.getFirstName();
+        String email = usersSnapShot.getEmail();
+        String firstName = usersSnapShot.getFirstName();
 
         log.info("Order placement has started ");
         //  Fetch cart items from cart service (web client)
-        List<CartItem> cartItems = cartClient.getCartItems(orderRequest.getCustomerId());
+        List<CartItem> cartItems = cartClient.getCartItems(orderRequest.getUserId());
         if (cartItems == null || cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
@@ -74,7 +74,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
         //  Create Order entity
         Order order = new Order();
         order.setOrderNumber(orderNumber);
-        order.setCustomerId(orderRequest.getCustomerId());
+        order.setUserId(orderRequest.getUserId());
         order.setPaymentMethod(orderRequest.getPaymentMethod());
         order.setDeliveryAddress(orderRequest.getDeliveryAddress());
         order.setOrderStatus(OrderStatus.PENDING);
