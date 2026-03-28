@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfiguration {
 
-    //This  used to create and configure a WebClient bean that can be injected  in  application.
+    //web client bean
     @Bean
     @LoadBalanced
     public WebClient.Builder webClientBuilder(){
