@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class PaymentRequestProducer {
     private final KafkaTemplate<String, OrderPaymentEvent> kafkaTemplate;
 
-    //sends event to payment service for payment of the order placed
+    //publish payment event of order placed
     public void sendOrderPlacementEvent(OrderPaymentEvent orderPaymentEvent){
         log.info("Start sending payment   event to payment service");
 
@@ -26,7 +26,7 @@ public class PaymentRequestProducer {
         kafkaTemplate.send(message);
 
         log.info("Payment event  sent  successfully of order number {}", orderPaymentEvent.getOrderNumber());
-        kafkaTemplate.flush();   //this ensures all the event created is sent to kafka  if the service crushes
+        kafkaTemplate.flush();
 
     }
 }
