@@ -22,7 +22,7 @@ public class OrderItem {
     private String productName;
     private Integer quantity;
     private Double price;
-    private String sellerId;
+    private String userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
