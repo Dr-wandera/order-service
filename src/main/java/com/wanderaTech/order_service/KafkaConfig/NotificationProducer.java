@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class NotificationProducer {
     private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
-    //this method publish an event to Kafka when an order is placed, so that another microservice (Notification Service) can process it and notify the customer.
+    //publish notification event to customer (order placed notification)
     public void sendOrderPlacedNotificationToCustomer(OrderPlacedEvent orderPlacedEvent){
         log.info("Start sending order notification event to Notification Service");
 
@@ -30,7 +30,7 @@ public class NotificationProducer {
         kafkaTemplate.flush();   //this ensures all the event created is sent to kafka  if the service crushes
 
     }
-    //this method publish an event to Kafka when an order is placed, so that another microservice (Notification Service) can process it and notify the customer.
+    // publish notification  event to seller  (product purchased event)
     public void sendOrderPlacedNotificationToSeller(SellerNotificationEvent sellerNotificationEvent){
         log.info("Start sending order notification event to Notification Service to notify seller of his product sold ");
 
