@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class  OrderRequest {
-     private String customerId;
+     private String userId;
     private PaymentMethod paymentMethod;
     private Address deliveryAddress;
     private DeliveryDetails deliveryDetails;
