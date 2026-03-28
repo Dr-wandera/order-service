@@ -1,8 +1,8 @@
 package com.wanderaTech.order_service.EventConsumer;
 
-import com.wanderaTech.common_events.CustomerEvent.CustomerCreatedEvent;
-import com.wanderaTech.order_service.Repository.CustomerSnapshotRepository;
-import com.wanderaTech.order_service.UsersReplicaModel.CustomerSnapSot;
+import com.wanderaTech.common_events.UsersEvent.UserCreatedEvent;
+import com.wanderaTech.order_service.Repository.UserSnapShotRepository;
+import com.wanderaTech.order_service.UsersReplicaModel.UsersSnapShot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -12,21 +12,21 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomerEventConsumer {
-    private final CustomerSnapshotRepository repository;
+    private final UserSnapShotRepository userSnapShotRepository;
 
     //this listen to the customer-topic from customer service to store customer info in order service
     @KafkaListener(topics = "customer-topic", groupId = "order-group")
-    public void consume(CustomerCreatedEvent event) {
+    public void consume(UserCreatedEvent event) {
 
-        CustomerSnapSot snapshot = CustomerSnapSot.builder()
-                .customerId(event.getCustomerId())
-                .email(event.getEmail())
-                .phoneNumber(event.getPhoneNumber())
-                .firstName(event.getFirstName())
-                .build();
+        UsersSnapShot snapShot=new UsersSnapShot();
+        snapShot.setUserId(event.getUserId());
+        snapShot.setFirstName(event.getFirstName());
+        snapShot.setLastName(event.getLastName());
+        snapShot.setEmail(event.getEmail());
+        snapShot.setPhoneNumber(event.getPhoneNumber());
 
-        repository.save(snapshot);
+        userSnapShotRepository.save(snapShot);
 
-        log.info("Customer snapshot saved  successfully of customerId {}", event.getCustomerId());
+        log.info("Customer snapshot saved  successfully of customerId {}", event.getUserId());
     }
 }
