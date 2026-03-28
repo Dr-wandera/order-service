@@ -108,18 +108,18 @@ public class OrderServiceImplementation implements OrderServiceInterface {
                 )
         );
 
-        //this sends Kafka event to notification service to notify customer of item bought if the order status change to pay
+        //sends notification event to customer of item bought
         if (savedOrder.getOrderStatus().equals(OrderStatus.PAID)) {
             notificationProducer.sendOrderPlacedNotificationToCustomer(
                     OrderPlacedEvent.builder()
                             .orderNumber(savedOrder.getOrderNumber())
-                            .customerId(savedOrder.getCustomerId())
+                            .userId(savedOrder.getUserId())
                             .email(email)
                             .firstName(firstName)
                             .totalAmount(savedOrder.getTotalAmount())
                             .createdAt(savedOrder.getOrderDate())
 
-                            //this  convert orderItem (entity) to order item event  (DTO for kafka)
+                            //  convert orderItem (entity) to order item event  (DTO for kafka)
                             .items(
                                     savedOrder.getItems().stream()
                                             .map(item -> OrderItemEvent.builder()
@@ -134,7 +134,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
             );
 
 
-            // 3. Publish Kafka event   to reduce  product stock that is in the order item (iterate)
+            // 3. Publish reduce stock event   to inventory (iterate)
             for (OrderItem item : savedOrder.getItems()) {
                 reduceStockProducer.sendReduceStockAfterProductPurchase(
                         new StockReduceEvent(
@@ -148,16 +148,16 @@ public class OrderServiceImplementation implements OrderServiceInterface {
 
 
             //  Clear cart after order placed in cart-service
-            cartClient.clearCart(orderRequest.getCustomerId());
-            log.info("Cart items cleared  successfully of customer id {}", orderRequest.getCustomerId());
+            cartClient.clearCart(orderRequest.getUserId());
+            log.info("Cart items cleared  successfully of customer id {}", orderRequest.getUserId());
 
         }
         return toDto(savedOrder);
     }
     @Override
-    public List<OrderResponse> getOrdersByCustomer(String customerId) {
+    public List<OrderResponse> getOrdersByCustomer(String userId) {
 
-        List<Order> orders = orderRepository.findAllByCustomerId(customerId);
+        List<Order> orders = orderRepository.findAllByUserId(userId);
 
         if (orders.isEmpty()) {
             throw new RuntimeException("You have no order by now");
@@ -192,6 +192,5 @@ public class OrderServiceImplementation implements OrderServiceInterface {
 
         return orderNumber;
     }
-
 
 }
