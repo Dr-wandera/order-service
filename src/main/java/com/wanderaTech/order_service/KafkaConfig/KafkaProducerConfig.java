@@ -8,7 +8,7 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaProducerConfig {
 
-    //this creates reduce stock topic to kafka that reduce product quantity after customer purchase
+    //create kafka topic
     @Bean
     public NewTopic reduceStockTopic(){
         return TopicBuilder
@@ -18,7 +18,6 @@ public class KafkaProducerConfig {
                 .build();
     }
 
-    //this creates notification topic
     @Bean
     public NewTopic customerNotificationTopic(){
         return TopicBuilder
@@ -27,7 +26,6 @@ public class KafkaProducerConfig {
                 .replicas(1)
                 .build();
     }
-    //this creates notification topi
     @Bean
     public NewTopic sellerNotificationTopic(){
         return TopicBuilder
@@ -36,7 +34,6 @@ public class KafkaProducerConfig {
                 .replicas(1)
                 .build();
     }
-    //creates payment request topic to payment service
     @Bean
     public NewTopic paymentRequestTopic(){
         return TopicBuilder
