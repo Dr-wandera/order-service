@@ -107,7 +107,7 @@ public class PaymentResultEventConsumer {
             notificationProducer.sendOrderPlacedNotificationToSeller(
 
                     SellerNotificationEvent.builder()
-                            .sellerId(sellerId)
+                            .userId(sellerId)
                             .sellerEmail(userSnapShot.getEmail())
                             .orderNumber(order.getOrderNumber())
                             .email(email)
