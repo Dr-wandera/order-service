@@ -18,12 +18,16 @@ public class OrderController {
 
     @PostMapping("/place")
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderResponse placeOrder(@RequestBody OrderRequest orderRequest) {
-        return orderServiceImplementation.placeOrder(orderRequest);
+    public OrderResponse placeOrder(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestBody OrderRequest orderRequest
+    ) {
+        return orderServiceImplementation.placeOrder(userId,orderRequest);
     }
-    @GetMapping("/customer/{customerId}")
+    // orders customer placed
+    @GetMapping("/customer")
     @ResponseStatus(HttpStatus.OK)
-    public List<OrderResponse> getOrdersByCustomer(@PathVariable String customerId) {
-        return orderServiceImplementation.getOrdersByCustomer(customerId);
+    public List<OrderResponse> getOrdersByCustomer(@RequestHeader("X-User-Id") String userId) {
+        return orderServiceImplementation.getOrdersByCustomer(userId);
     }
 }
