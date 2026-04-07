@@ -13,25 +13,27 @@ public class CartClient {
 
     private final WebClient.Builder webClient;
 
-    public List<CartItem> getCartItems(String customerId) {
+    public List<CartItem> getCartItems(String userId) {
 
         return webClient
                 .baseUrl("http://cart-service")
                 .build()
                 .get()
-                .uri("/api/v1/cart/{customerId}", customerId)
+                .uri("/api/v1/cart/get/cartItem")
+                .header("X-User-Id", userId)
                 .retrieve()
                 .bodyToFlux(CartItem.class)
                 .collectList()
                 .block();
     }
 
-    public void clearCart(String customerId) {
+    public void clearCart(String userId) {
         webClient
                 .baseUrl("http://cart-service")
                 .build()
                 .delete()
-                .uri("/api/v1/cart/{customerId}", customerId)
+                .uri("/api/v1/cart/delete")
+                .header("X-User-Id", userId)
                 .retrieve()
                 .toBodilessEntity()
                 .block();
