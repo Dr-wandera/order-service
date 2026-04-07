@@ -6,7 +6,7 @@ import com.wanderaTech.order_service.OrderDto.OrderResponse;
 import java.util.List;
 
 public interface OrderServiceInterface {
-    OrderResponse placeOrder(OrderRequest orderRequest);
+    OrderResponse placeOrder(String userId,OrderRequest orderRequest);
 
     List<OrderResponse> getOrdersByCustomer(String customerId);
 }
