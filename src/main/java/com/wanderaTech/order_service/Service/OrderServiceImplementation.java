@@ -2,6 +2,7 @@ package com.wanderaTech.order_service.Service;
 
 import com.wanderaTech.common_events.NotificationEvent.OrderItemEvent;
 import com.wanderaTech.common_events.NotificationEvent.OrderPlacedEvent;
+import com.wanderaTech.common_events.NotificationEvent.SellerNotificationEvent;
 import com.wanderaTech.common_events.PaymentEvent.OrderPaymentEvent;
 import com.wanderaTech.common_events.productEvent.StockReduceEvent;
 import com.wanderaTech.order_service.Client.CartClient;
@@ -36,9 +37,10 @@ public class OrderServiceImplementation implements OrderServiceInterface {
     private final PaymentRequestProducer paymentRequestProducer;
     private final UserSnapShotRepository userSnapShotRepository;
 
+    // Logged-in user places order
     @Transactional
     @Override
-    public OrderResponse placeOrder(OrderRequest orderRequest) {
+    public OrderResponse placeOrder(String userId,OrderRequest orderRequest) {
 
         //generate order number
         String orderNumber = generateOrderNumber();
@@ -49,8 +51,8 @@ public class OrderServiceImplementation implements OrderServiceInterface {
             return toDto(orderRepository.findByOrderNumber(orderNumber).get());
         }
 
-        // get customer email from the customerSnapShot saved in the order service.  (Customer replica)
-        UsersSnapShot usersSnapShot = userSnapShotRepository.findByUserId((orderRequest.getUserId()))
+        // get user email from the userSnapShot saved in the order service.  (user replica)
+        UsersSnapShot usersSnapShot = userSnapShotRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("customerId not available"));
 
         String email = usersSnapShot.getEmail();
@@ -58,7 +60,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
 
         log.info("Order placement has started ");
         //  Fetch cart items from cart service (web client)
-        List<CartItem> cartItems = cartClient.getCartItems(orderRequest.getUserId());
+        List<CartItem> cartItems = cartClient.getCartItems(userId);
         if (cartItems == null || cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
@@ -68,13 +70,13 @@ public class OrderServiceImplementation implements OrderServiceInterface {
         double total = cartItems.stream()
                 .mapToDouble(item -> item.getPrice() * item.getQuantity())
                 .sum();
-        log.info("Order total amount has started  the amount is {}", total);
+        log.info("Order total amount is {}", total);
 
 
         //  Create Order entity
         Order order = new Order();
         order.setOrderNumber(orderNumber);
-        order.setUserId(orderRequest.getUserId());
+        order.setUserId(userId);
         order.setPaymentMethod(orderRequest.getPaymentMethod());
         order.setDeliveryAddress(orderRequest.getDeliveryAddress());
         order.setOrderStatus(OrderStatus.PENDING);
@@ -99,16 +101,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
         Order savedOrder = orderRepository.save(order);
         log.info("Order  has saved successfully as PENDING  {}", savedOrder);
 
-        //sends payment event
-        paymentRequestProducer.sendOrderPlacementEvent(
-                new OrderPaymentEvent(
-                        savedOrder.getOrderNumber(),
-                        savedOrder.getTotalAmount(),
-                        orderRequest.getPhoneNumber()
-                )
-        );
-
-        //sends notification event to customer of item bought
+        //sends notification event to customer of item bought if the status is turned paid
         if (savedOrder.getOrderStatus().equals(OrderStatus.PAID)) {
             notificationProducer.sendOrderPlacedNotificationToCustomer(
                     OrderPlacedEvent.builder()
@@ -133,8 +126,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
                             .build()
             );
 
-
-            // 3. Publish reduce stock event   to inventory (iterate)
+            // 3. Publish reduce stock event   to inventory (iterate) Kafka
             for (OrderItem item : savedOrder.getItems()) {
                 reduceStockProducer.sendReduceStockAfterProductPurchase(
                         new StockReduceEvent(
@@ -148,10 +140,19 @@ public class OrderServiceImplementation implements OrderServiceInterface {
 
 
             //  Clear cart after order placed in cart-service
-            cartClient.clearCart(orderRequest.getUserId());
-            log.info("Cart items cleared  successfully of customer id {}", orderRequest.getUserId());
+            cartClient.clearCart(userId);
+            log.info("Cart items cleared  successfully of customer id {}", userId);
 
         }
+
+        //sends payment event
+        paymentRequestProducer.sendOrderPlacementEvent(
+                new OrderPaymentEvent(
+                        savedOrder.getOrderNumber(),
+                        savedOrder.getTotalAmount(),
+                        orderRequest.getPhoneNumber()
+                )
+        );
         return toDto(savedOrder);
     }
     @Override
