@@ -2,7 +2,7 @@ package com.wanderaTech.order_service.Service;
 
 import com.wanderaTech.common_events.NotificationEvent.OrderItemEvent;
 import com.wanderaTech.common_events.NotificationEvent.OrderPlacedEvent;
-import com.wanderaTech.common_events.NotificationEvent.SellerNotificationEvent;
+
 import com.wanderaTech.common_events.PaymentEvent.OrderPaymentEvent;
 import com.wanderaTech.common_events.productEvent.StockReduceEvent;
 import com.wanderaTech.order_service.Client.CartClient;
@@ -112,7 +112,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
                             .totalAmount(savedOrder.getTotalAmount())
                             .createdAt(savedOrder.getOrderDate())
 
-                            //  convert orderItem (entity) to order item event  (DTO for kafka)
+                            //  convert orderItem (entity) to order item event  (DTO for Kafka)
                             .items(
                                     savedOrder.getItems().stream()
                                             .map(item -> OrderItemEvent.builder()
