@@ -101,6 +101,16 @@ public class OrderServiceImplementation implements OrderServiceInterface {
         Order savedOrder = orderRepository.save(order);
         log.info("Order  has saved successfully as PENDING  {}", savedOrder);
 
+
+        //sends payment event
+        paymentRequestProducer.sendOrderPlacementEvent(
+                new OrderPaymentEvent(
+                        savedOrder.getOrderNumber(),
+                        savedOrder.getTotalAmount(),
+                        orderRequest.getPhoneNumber()
+                )
+        );
+
         //sends notification event to customer of item bought if the status is turned paid
         if (savedOrder.getOrderStatus().equals(OrderStatus.PAID)) {
             notificationProducer.sendOrderPlacedNotificationToCustomer(
@@ -145,14 +155,6 @@ public class OrderServiceImplementation implements OrderServiceInterface {
 
         }
 
-        //sends payment event
-        paymentRequestProducer.sendOrderPlacementEvent(
-                new OrderPaymentEvent(
-                        savedOrder.getOrderNumber(),
-                        savedOrder.getTotalAmount(),
-                        orderRequest.getPhoneNumber()
-                )
-        );
         return toDto(savedOrder);
     }
     @Override
