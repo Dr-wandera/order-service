@@ -30,4 +30,7 @@ public class OrderController {
     public List<OrderResponse> getOrdersByCustomer(@RequestHeader("X-User-Id") String userId) {
         return orderServiceImplementation.getOrdersByCustomer(userId);
     }
+
+//    public OrderResponse getProductSold
+
 }
