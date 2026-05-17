@@ -79,7 +79,7 @@ public class OrderServiceImplementation implements OrderServiceInterface {
         order.setUserId(userId);
         order.setPaymentMethod(orderRequest.getPaymentMethod());
         order.setDeliveryAddress(orderRequest.getDeliveryAddress());
-        order.setOrderStatus(OrderStatus.PENDING);
+        order.setOrderStatus(OrderStatus.PENDING); //status will be changed  to paid if payment is done successful
         order.setTotalAmount(total);
         order.setOrderDate(LocalDateTime.now());
 
