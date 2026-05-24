@@ -3,10 +3,13 @@ package com.wanderaTech.order_service.Service;
 import com.wanderaTech.order_service.OrderDto.OrderRequest;
 import com.wanderaTech.order_service.OrderDto.OrderResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface OrderServiceInterface {
     OrderResponse placeOrder(String userId,OrderRequest orderRequest);
 
     List<OrderResponse> getOrdersByCustomer(String customerId);
+
+	List<OrderResponse> getAllOrdersUnderDate(LocalDate orderDate, int size, int page);
 }

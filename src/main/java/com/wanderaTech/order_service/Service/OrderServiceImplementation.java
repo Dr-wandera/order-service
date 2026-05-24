@@ -20,9 +20,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -176,6 +180,48 @@ public class OrderServiceImplementation implements OrderServiceInterface {
                 .toList();
 
     }
+
+    // method that return order based  on the date placed
+    @Override
+    public List<OrderResponse> getAllOrdersUnderDate(LocalDate orderDate, int size, int page) {
+
+        Pageable pageable=PageRequest.of(page,size);
+
+        Page<Order> orderPage=orderRepository.findByOrderDate(orderDate,pageable);
+
+        //return order response in pages
+               return orderPage.getContent()
+                .stream()
+                .map(order -> new OrderResponse(
+                       order.getOrderNumber(),
+                       order.getTotalAmount(),
+                        order.getItems()
+               ))
+                .toList();
+
+    }
+
+//    @Override
+//    public List<OrderResponse> getAllOrdersUnderDate(LocalDate orderDate, int size, int page) {
+//
+//        Pageable pageable= (Pageable) PageRequest.of(page,size);
+//
+//
+//        Page<Order> productsPage =
+//                orderRepository.findByOrderDate(orderDate,pageable);
+//
+//        return productsPage.getContent()
+//                .stream()
+//                .map(product -> new ProductResponse(
+//                        product.getProductName(),
+//                        product.getProductDescription(),
+//                        product.getPrice()
+//                ))
+//                .toList();
+//    }
+//
+//    }
+
 
     //converting entity to dto
     private OrderResponse toDto(Order savedOrder) {
