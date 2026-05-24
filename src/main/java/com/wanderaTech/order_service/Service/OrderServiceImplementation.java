@@ -19,6 +19,7 @@ import com.wanderaTech.order_service.UsersReplicaModel.UsersSnapShot;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -157,7 +158,9 @@ public class OrderServiceImplementation implements OrderServiceInterface {
 
         return toDto(savedOrder);
     }
-    @Override
+
+    //method  that return order a user has placed
+    @Cacheable(value = "ORDER_DATA", key = "#userId")    @Override
     public List<OrderResponse> getOrdersByCustomer(String userId) {
 
         List<Order> orders = orderRepository.findAllByUserId(userId);
